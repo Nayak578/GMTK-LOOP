@@ -1,3 +1,4 @@
+using StarterAssets;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,19 +9,30 @@ public class GM : MonoBehaviour
     private float timer = 0f;
     public Transform playerTransform;
     [SerializeField]private Dataframe[] buffer;
+    [SerializeField] private Dataframe[,] buffer1;
     private int writeIndex=0;
+    public int columnIndex=-1;
     private int size=0;
-    private bool recording = true;
+    [SerializeField]private ThirdPersonController tpc;
+    private bool recording = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        tpc = playerTransform.GetComponent<ThirdPersonController>();
         buffer = new Dataframe[maxframes];
+        buffer1 = new Dataframe[5,maxframes];
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if (!recording) return;
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.G)) {
+            columnIndex++;
+            writeIndex = 0;
+            size = 0;
+            recording = true;
+        }
+
+        if (!recording||columnIndex>=5) return;
         timer += Time.deltaTime;
         if (timer > recordInterval) {
             //Debug.Log("isRecording");
@@ -32,11 +44,14 @@ public class GM : MonoBehaviour
         Dataframe data = new Dataframe {
             location = playerTransform.position,
             rotation = playerTransform.rotation,
-            jumped = Input.GetKeyDown(KeyCode.Space)
+            jumped = Input.GetKeyDown(KeyCode.Space),
+            animationBlend = tpc.GetAnimationBlend(),
+            inputMagnitude = tpc.GetInputMagnitude()
         };
         
         //Debug.Log("Buffer Recording");
         buffer[writeIndex] = data;
+        buffer1[columnIndex,writeIndex] = data;
         Debug.Log( buffer[writeIndex].location);
         writeIndex =(writeIndex+1)%maxframes;
         size = Mathf.Min(size + 1, maxframes);
@@ -50,7 +65,7 @@ public class GM : MonoBehaviour
 
         for (int i = 0; i < size; i++) {
             int index = (startIndex + i) % maxframes;
-            result.Add(buffer[index]);
+            result.Add(buffer1[columnIndex,index]);
         }
         return result;
     }

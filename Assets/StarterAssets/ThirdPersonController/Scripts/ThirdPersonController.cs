@@ -189,6 +189,12 @@ namespace StarterAssets
                 _animator.SetBool(_animIDGrounded, Grounded);
             }
         }
+        public float GetInputMagnitude() {
+            return _input.analogMovement ? _input.move.magnitude : 1f;
+        }
+        public float GetAnimationBlend() {
+            return _animationBlend;
+        }
 
         private void CameraRotation()
         {

@@ -16,11 +16,11 @@ public class PlayerMovement : MonoBehaviour
     public void OnDeath() {
         GM.stopRecording();
         List<Dataframe> replayData = GM.GetReplay();
-
         GameObject ghost = Instantiate(ghostPrefab);
         ghost.transform.position = replayData[0].location; // Start where the player spawned
         ghost.GetComponent<Ghost>().replayData = replayData;
-        gameObject.SetActive(false);
+        if (GM.columnIndex < 4) transform.position = new Vector3(0, 0, 0);
+        else gameObject.SetActive(false);
     }
 
 }

@@ -8,17 +8,34 @@ public class Ghost : MonoBehaviour
     public float replayInterval = 0.05f;
 
     private float timer = 0f;
-
+    [SerializeField]Animator animator;
+    private int _animIDSpeed;
+    private int _animIDMotionSpeed;
+    private void Start() {
+        if (animator) {
+            _animIDSpeed = Animator.StringToHash("Speed");
+            _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+        }
+    }
     void Update() {
-        if (replayData == null || currentFrame >= replayData.Count) return;
-
+        if (replayData == null || currentFrame >= replayData.Count) {
+            if (animator) {
+               animator.SetFloat(_animIDMotionSpeed, 0);
+            }
+            return;
+        }
+        
         timer += Time.deltaTime;
         if (timer >= replayInterval) {
             Dataframe frame = replayData[currentFrame];
-            transform.position = frame.location+new Vector3(0,1,0);
+            transform.position = frame.location;
             transform.rotation = frame.rotation;
-            
 
+            if (animator) {
+                animator.SetFloat(_animIDSpeed, frame.animationBlend, 0.1f, Time.deltaTime);
+                animator.SetFloat(_animIDMotionSpeed, frame.inputMagnitude, 0.1f, Time.deltaTime);
+
+            }
             // Optional: animation handling here
             // animator.SetTrigger("Jump") if frame.jumped etc.
 
