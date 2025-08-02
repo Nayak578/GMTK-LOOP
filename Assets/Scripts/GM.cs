@@ -17,6 +17,8 @@ public class GM : MonoBehaviour
     public Ghost[] ghosts=new Ghost[5];
     [SerializeField]private ThirdPersonController tpc;
     private bool recording = false;
+    private bool latch = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -32,6 +34,10 @@ public class GM : MonoBehaviour
             writeIndex = 0;
             size = 0;
             recording = true;
+            Debug.Log("Recording");
+        }
+        if (Input.GetKeyDown(KeyCode.E)) {
+            latch = true;
         }
         if (Input.GetKeyDown(KeyCode.Alpha1)) SpawnGhost(0);
         if (Input.GetKeyDown(KeyCode.Alpha2)) SpawnGhost(1);
@@ -45,6 +51,7 @@ public class GM : MonoBehaviour
             //Debug.Log("isRecording");
             timer = 0;
             RecordFrame();
+            latch = false;
         }
     }
     void SpawnGhost(int index) {
@@ -71,18 +78,20 @@ public class GM : MonoBehaviour
             rotation = playerTransform.rotation,
             jumped = Input.GetKeyDown(KeyCode.Space),
             animationBlend = tpc.GetAnimationBlend(),
-            inputMagnitude = tpc.GetInputMagnitude()
+            inputMagnitude = tpc.GetInputMagnitude(),
+            interacts = latch
         };
         
         //Debug.Log("Buffer Recording");
         buffer[writeIndex] = data;
         buffer1[columnIndex,writeIndex] = data;
-        Debug.Log( buffer[writeIndex].location);
+        //Debug.Log( buffer[writeIndex].location);
         writeIndex =(writeIndex+1)%maxframes;
         size = Mathf.Min(size + 1, maxframes);
     }
     public void stopRecording() {
         recording = false;
+        Debug.Log("Recording stopped");
     }
     public List<Dataframe> GetReplay() {
         List<Dataframe> result = new List<Dataframe>(size);

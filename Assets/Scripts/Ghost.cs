@@ -35,6 +35,9 @@ public class Ghost : MonoBehaviour
                 animator.SetFloat(_animIDSpeed, frame.animationBlend, 0.1f, Time.deltaTime);
                 animator.SetFloat(_animIDMotionSpeed, frame.inputMagnitude, 0.1f, Time.deltaTime);
             }
+            if (frame.interacts) {
+                InteractWithNearbyObject();
+            }
             // Optional: animation handling here
             // animator.SetTrigger("Jump") if frame.jumped etc.
 
@@ -42,4 +45,15 @@ public class Ghost : MonoBehaviour
             timer = 0f;
         }
     }
+    void InteractWithNearbyObject() {
+        Collider[] hits = Physics.OverlapSphere(transform.position, 5f); // radius of interaction
+        foreach (var hit in hits) {
+            Interactable interactable = hit.GetComponent<Interactable>();
+            if (interactable != null) {
+                interactable.Interact();
+                break;
+            }
+        }
+    }
+
 }
