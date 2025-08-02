@@ -7,4 +7,5 @@ public struct Dataframe
     public bool jumped;
     public float animationBlend;
     public float inputMagnitude;
+    public bool interacts;
 }
