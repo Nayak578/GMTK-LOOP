@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
     public void OnDeath() {
         GM.stopRecording();
         // Reset or disable player
-        if (GM.columnIndex < 4)
+        if (GM.columnIndex < 5)
             transform.position = Vector3.zero;
         else
             gameObject.SetActive(false);

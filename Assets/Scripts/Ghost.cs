@@ -13,7 +13,7 @@ public class Ghost : MonoBehaviour {
 
     private Dataframe current;
     private Dataframe next;
-
+    
     private void Start() {
         if (animator) {
             _animIDSpeed = Animator.StringToHash("Speed");
