@@ -414,9 +414,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 354361c01768bbc4cb924683cd96e1df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ghostPrefab: {fileID: 4416926081852918481, guid: a0e96ce1a15bdba47b376295739114ba, type: 3}
   recordInterval: 0.05
   maxframes: 2000
   playerTransform: {fileID: 1444915607}
+  columnIndex: -1
+  ghosts:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  tpc: {fileID: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0

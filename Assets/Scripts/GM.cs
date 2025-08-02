@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GM : MonoBehaviour
 {
+    public GameObject ghostPrefab;
     public float recordInterval = 0.05f;
     public int maxframes = 2000;
     private float timer = 0f;
@@ -13,6 +14,7 @@ public class GM : MonoBehaviour
     private int writeIndex=0;
     public int columnIndex=-1;
     private int size=0;
+    public Ghost[] ghosts=new Ghost[5];
     [SerializeField]private ThirdPersonController tpc;
     private bool recording = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -31,6 +33,11 @@ public class GM : MonoBehaviour
             size = 0;
             recording = true;
         }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SpawnGhost(0);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) SpawnGhost(1);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) SpawnGhost(2);
+        if (Input.GetKeyDown(KeyCode.Alpha4)) SpawnGhost(3);
+        if (Input.GetKeyDown(KeyCode.Alpha5)) SpawnGhost(4);
 
         if (!recording||columnIndex>=5) return;
         timer += Time.deltaTime;
@@ -40,6 +47,24 @@ public class GM : MonoBehaviour
             RecordFrame();
         }
     }
+    void SpawnGhost(int index) {
+        if (index > columnIndex) return;
+
+        GameObject g = Instantiate(ghostPrefab,
+            buffer1[index, 0].location,
+            Quaternion.identity);
+
+        Ghost ghostComponent = g.GetComponent<Ghost>();
+        ghostComponent.replayData = new List<Dataframe>();
+
+        for (int i = 0; i < size; i++) {
+            ghostComponent.replayData.Add(buffer1[index, i]);
+        }
+
+        ghostComponent.enabled = true;
+    }
+
+
     void RecordFrame() {
         Dataframe data = new Dataframe {
             location = playerTransform.position,

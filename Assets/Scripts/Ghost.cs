@@ -34,7 +34,6 @@ public class Ghost : MonoBehaviour
             if (animator) {
                 animator.SetFloat(_animIDSpeed, frame.animationBlend, 0.1f, Time.deltaTime);
                 animator.SetFloat(_animIDMotionSpeed, frame.inputMagnitude, 0.1f, Time.deltaTime);
-
             }
             // Optional: animation handling here
             // animator.SetTrigger("Jump") if frame.jumped etc.
