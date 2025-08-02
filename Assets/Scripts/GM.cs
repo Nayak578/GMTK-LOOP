@@ -1,4 +1,6 @@
 using StarterAssets;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +8,7 @@ public class GM : MonoBehaviour
 {
     public GameObject ghostPrefab;
     public float recordInterval = 0.05f;
-    public int maxframes = 2000;
+    public int maxframes = 500;
     private float timer = 0f;
     public Transform playerTransform;
     [SerializeField]private Dataframe[] buffer;
@@ -18,7 +20,9 @@ public class GM : MonoBehaviour
     [SerializeField]private ThirdPersonController tpc;
     private bool recording = false;
     private bool latch = false;
-
+    public GameObject[] images = new GameObject[5];
+    public GameObject isRecording;
+    public GameObject overflow;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -31,6 +35,7 @@ public class GM : MonoBehaviour
     void Update() {
         if (Input.GetKeyDown(KeyCode.G)) {
             columnIndex++;
+            isRecording.SetActive(true);
             writeIndex = 0;
             size = 0;
             recording = true;
@@ -39,11 +44,25 @@ public class GM : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E)) {
             latch = true;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1)) SpawnGhost(0);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) SpawnGhost(1);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) SpawnGhost(2);
-        if (Input.GetKeyDown(KeyCode.Alpha4)) SpawnGhost(3);
-        if (Input.GetKeyDown(KeyCode.Alpha5)) SpawnGhost(4);
+        if (Input.GetKeyDown(KeyCode.Alpha1)) { SpawnGhost(0);
+            images[0].SetActive(false);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2)) {
+            SpawnGhost(1);
+            images[1].SetActive(false);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3)) {
+            SpawnGhost(2);
+            images[2].SetActive(false);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4)) {
+            SpawnGhost(3);
+            images[3].SetActive(false);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5)) {
+            SpawnGhost(4);
+            images[4].SetActive(false);
+        }
 
         if (!recording||columnIndex>=5) return;
         timer += Time.deltaTime;
@@ -81,28 +100,40 @@ public class GM : MonoBehaviour
             inputMagnitude = tpc.GetInputMagnitude(),
             interacts = latch
         };
-        
+
         //Debug.Log("Buffer Recording");
         buffer[writeIndex] = data;
-        buffer1[columnIndex,writeIndex] = data;
+        buffer1[columnIndex, writeIndex] = data;
         //Debug.Log( buffer[writeIndex].location);
+        if (writeIndex == maxframes - 2) {
+            StartCoroutine(ActivateTemporarily());
+            writeIndex = 0;
+            size = 0;
+            return;
+        }
         writeIndex =(writeIndex+1)%maxframes;
         size = Mathf.Min(size + 1, maxframes);
     }
     public void stopRecording() {
+        isRecording.SetActive(false);
+        images[columnIndex].SetActive(true);
         recording = false;
         Debug.Log("Recording stopped");
     }
     public List<Dataframe> GetReplay() {
         List<Dataframe> result = new List<Dataframe>(size);
         int startIndex = (writeIndex - size + maxframes) % maxframes;
-
+        
         for (int i = 0; i < size; i++) {
             int index = (startIndex + i) % maxframes;
             result.Add(buffer1[columnIndex,index]);
         }
         return result;
     }
-
+    IEnumerator ActivateTemporarily() {
+        overflow.SetActive(true);             // Activate it
+        yield return new WaitForSeconds(5); // Wait for some time
+        overflow.SetActive(false);            // Deactivate it
+    }
 
 }
