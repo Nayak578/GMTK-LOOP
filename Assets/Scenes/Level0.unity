@@ -4699,9 +4699,33 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1372905877440935635, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.99999
+      objectReference: {fileID: 0}
+    - target: {fileID: 1372905877440935635, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -48
+      objectReference: {fileID: 0}
+    - target: {fileID: 1372905877440935635, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -107
+      objectReference: {fileID: 0}
     - target: {fileID: 2179712927842989328, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
       propertyPath: m_Name
       value: GhostUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 7868411313875999293, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_text
+      value: 'G: Record
+
+        K: Suicide
+
+        Backspace: Reset'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7868411313875999293, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_margin.z
+      value: 45.653313
       objectReference: {fileID: 0}
     - target: {fileID: 8091455460558319119, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
       propertyPath: m_Pivot.x
