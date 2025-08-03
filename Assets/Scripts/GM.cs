@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GM : MonoBehaviour {
     public GameObject ghostPrefab;
@@ -30,10 +31,19 @@ public class GM : MonoBehaviour {
         tpc = playerTransform.GetComponent<ThirdPersonController>();
         buffer = new Dataframe[maxframes];
         buffer1 = new Dataframe[5, maxframes];
+
+        // Lock the cursor
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
+
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.G)) {
+            if (Input.GetKeyDown(KeyCode.Backspace)) {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
+
             if (recording) {
                 Debug.LogWarning("Stop the current recording before starting a new one.");
                 return;

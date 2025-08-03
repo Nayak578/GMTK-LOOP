@@ -37,17 +37,17 @@ public class Laser : MonoBehaviour
         
         col.enabled = false;
         if (rend != null) {
-            rend.material.EnableKeyword("_EMISSION");
+            //rend.material.EnableKeyword("_EMISSION");
             rend.material.color = Color.green;
-            rend.material.SetColor("_EmissionColor", Color.green * 7f);
+            //rend.material.SetColor("_EmissionColor", Color.green * 7f);
         }
         yield return new WaitForSeconds(disableDuration);
 
         col.enabled = true;
         if (rend != null) {
-            rend.material.EnableKeyword("_EMISSION");
+            //rend.material.EnableKeyword("_EMISSION");
             rend.material.color = Color.red;
-            rend.material.SetColor("_EmissionColor", Color.red * 7f);
+            //rend.material.SetColor("_EmissionColor", Color.red * 7f);
         }
     }
 
