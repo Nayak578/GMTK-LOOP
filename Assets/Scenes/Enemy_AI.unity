@@ -1437,6 +1437,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ghostPrefab: {fileID: 4416926081852918481, guid: a0e96ce1a15bdba47b376295739114ba, type: 3}
   GM: {fileID: 1368306832}
+  respawn: {x: 19.16, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

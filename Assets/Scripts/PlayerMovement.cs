@@ -5,7 +5,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public GameObject ghostPrefab;
     public GM GM;
-
+    public Vector3 respawn;
     void Start() {
     }
     private void Update() {
@@ -19,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
         // Reset or disable player
         if (GM.columnIndex < 5) {
             GetComponent<CharacterController>().enabled = false;
-            transform.position = Vector3.zero;
+            transform.position =respawn;
             GetComponent<CharacterController>().enabled = true;
 
         } else

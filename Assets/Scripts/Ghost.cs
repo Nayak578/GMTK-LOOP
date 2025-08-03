@@ -10,6 +10,9 @@ public class Ghost : MonoBehaviour {
     [SerializeField] Animator animator;
     private int _animIDSpeed;
     private int _animIDMotionSpeed;
+    private int _animIDJump;
+    private bool hasJumped = false;
+    private int _animIDGrounded;
 
     private Dataframe current;
     private Dataframe next;
@@ -18,6 +21,9 @@ public class Ghost : MonoBehaviour {
         if (animator) {
             _animIDSpeed = Animator.StringToHash("Speed");
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+            _animIDJump = Animator.StringToHash("Jump");
+            _animIDGrounded = Animator.StringToHash("Grounded");
+
         }
 
         if (replayData != null && replayData.Count > 1) {
@@ -52,12 +58,19 @@ public class Ghost : MonoBehaviour {
             float blendedMagnitude = Mathf.Lerp(current.inputMagnitude, next.inputMagnitude, t);
             animator.SetFloat(_animIDSpeed, blendedSpeed, 0.1f, Time.deltaTime);
             animator.SetFloat(_animIDMotionSpeed, blendedMagnitude, 0.1f, Time.deltaTime);
+            if (animator && current.jumped && !hasJumped) {
+                animator.SetTrigger(_animIDJump);
+                animator.SetBool(_animIDGrounded, false);
+                hasJumped = true;
+            }
+
         }
 
         if (t >= 1f) {
             currentFrame++;
             timer = 0f;
-
+            hasJumped = false;
+            animator.SetBool(_animIDGrounded, true);
             if (currentFrame < replayData.Count - 1) {
                 current = replayData[currentFrame];
                 next = replayData[currentFrame + 1];
@@ -81,5 +94,7 @@ public class Ghost : MonoBehaviour {
     }
     public void OnDeath() {
         Debug.Log("Echo death");
+        Destroy(gameObject);
+        
     }
 }
