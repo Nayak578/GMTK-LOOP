@@ -15,5 +15,6 @@ public class ChangeLelvel1 : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other) {
         SceneManager.LoadScene("Level1");
+        SceneManager.UnloadSceneAsync("Level0");
     }
 }
