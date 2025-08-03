@@ -18,7 +18,7 @@ public class GM : MonoBehaviour
     private int size=0;
     public Ghost[] ghosts=new Ghost[5];
     [SerializeField]private ThirdPersonController tpc;
-    private bool recording = false;
+    public bool recording = false;
     private bool latch = false;
     public GameObject[] images = new GameObject[5];
     public GameObject isRecording;

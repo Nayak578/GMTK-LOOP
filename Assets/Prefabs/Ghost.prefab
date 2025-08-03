@@ -124,3 +124,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   replayInterval: 0.05
+  animator: {fileID: 0}

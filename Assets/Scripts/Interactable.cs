@@ -13,10 +13,16 @@ public class Interactable : MonoBehaviour {
         if (other.CompareTag("Player")) {
             isPlayerInRange = true;
         }
+        if (other.CompareTag("Echo")) {
+            isPlayerInRange = true;
+        }
     }
 
     private void OnTriggerExit(Collider other) {
         if (other.CompareTag("Player")) {
+            isPlayerInRange = false;
+        }
+        if (other.CompareTag("Echo")) {
             isPlayerInRange = false;
         }
     }
