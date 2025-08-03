@@ -14,11 +14,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
     public void OnDeath() {
-        GM.stopRecording();
+        Debug.Log("PlayerDeath");
+        if(GM.recording)GM.stopRecording();
         // Reset or disable player
-        if (GM.columnIndex < 5)
+        if (GM.columnIndex < 5) {
+            GetComponent<CharacterController>().enabled = false;
             transform.position = Vector3.zero;
-        else
+            GetComponent<CharacterController>().enabled = true;
+
+        } else
             gameObject.SetActive(false);
     }
 
