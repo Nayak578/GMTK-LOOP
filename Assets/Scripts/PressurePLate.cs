@@ -49,14 +49,14 @@ public class PressurePLate : MonoBehaviour {
 
     void SetActive() {
         rend.material.color = Color.green;
-        rend.material.EnableKeyword("_EMISSION");
-        rend.material.SetColor("_EmissionColor", Color.green * 7f);
+        //rend.material.EnableKeyword("_EMISSION");
+        //rend.material.SetColor("_EmissionColor", Color.green * 7f);
         isPlateActive = true;
     }
 
     void SetInactive() {
         rend.material.color = Color.red;
-        rend.material.SetColor("_EmissionColor", Color.red * 7f);
+        //rend.material.SetColor("_EmissionColor", Color.red * 7f);
         isPlateActive = false;
     }
 
