@@ -79,4 +79,7 @@ public class Ghost : MonoBehaviour {
             }
         }
     }
+    public void OnDeath() {
+        Debug.Log("Echo death");
+    }
 }
