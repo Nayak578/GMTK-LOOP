@@ -61,7 +61,7 @@ public class Ghost : MonoBehaviour {
             float blendedMagnitude = Mathf.Lerp(current.inputMagnitude, next.inputMagnitude, t);
             animator.SetFloat(_animIDSpeed, blendedSpeed, 0.1f, Time.deltaTime);
             animator.SetFloat(_animIDMotionSpeed, blendedMagnitude, 0.1f, Time.deltaTime);
-
+            
             if (current.jumped && !hasJumped) {
                 animator.SetTrigger(_animIDJump);
                 animator.SetBool(_animIDGrounded, false);
@@ -72,11 +72,13 @@ public class Ghost : MonoBehaviour {
         if (t >= 1f) {
             currentFrame++;
             timer = 0f;
-            hasJumped = false;
 
             if (animator) {
+                animator.ResetTrigger(_animIDJump); // Reset here
                 animator.SetBool(_animIDGrounded, true);
             }
+
+            hasJumped = false;
 
             if (currentFrame < replayData.Count - 1) {
                 current = replayData[currentFrame];
@@ -87,6 +89,7 @@ public class Ghost : MonoBehaviour {
                 }
             }
         }
+
     }
 
     void InteractWithNearbyObject() {
