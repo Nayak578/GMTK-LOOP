@@ -33,12 +33,26 @@ public class EnemyAI : MonoBehaviour {
     private Transform target;
     private Transform realPlayer;
     public Vector3 StartPos;
+
+    [Header("Animation")]
+    [SerializeField] private Animator animator;
+    private int _animIDWalk;
+    private int _animIDAttack;
+    private int _animIDIdle;
+
     private void Awake() {
         agent = GetComponent<NavMeshAgent>();
     }
+
     private void Start() {
         StartPos = transform.position;
+
+        if (animator == null) animator = GetComponent<Animator>();
+        _animIDWalk = Animator.StringToHash("isWalking");
+        _animIDAttack = Animator.StringToHash("isAttacking");
+        _animIDIdle = Animator.StringToHash("isIdle");
     }
+
     private void Update() {
         FindTargets();
 
@@ -80,6 +94,8 @@ public class EnemyAI : MonoBehaviour {
                     float angle = Mathf.Sin(currentRotationTime) * rotationAngle;
                     transform.rotation = originalRotation * Quaternion.Euler(0, angle, 0);
 
+                    SetAnimationState(false, false, true); // Idle while rotating
+
                     searchTimer -= Time.deltaTime;
                     if (searchTimer <= 0f) {
                         isSearching = false;
@@ -101,14 +117,12 @@ public class EnemyAI : MonoBehaviour {
     }
 
     private void FindTargets() {
-        // Ensure real player is tracked
         if (realPlayer == null) {
             GameObject found = GameObject.FindWithTag("Player");
             if (found != null)
                 realPlayer = found.transform;
         }
 
-        // Track all echoes
         GameObject[] echoes = GameObject.FindGameObjectsWithTag("Echo");
         float minEchoDist = Mathf.Infinity;
         Transform closestEcho = null;
@@ -125,7 +139,6 @@ public class EnemyAI : MonoBehaviour {
             }
         }
 
-        // Decide who to target
         bool echoInFOV = closestEcho != null && CanSeeTarget(closestEcho);
         bool playerInFOV = realPlayer != null && CanSeeTarget(realPlayer);
 
@@ -159,11 +172,13 @@ public class EnemyAI : MonoBehaviour {
 
     private void ChaseTarget() {
         agent.SetDestination(GetFlatPosition(target));
+        SetAnimationState(true, false, false); // Walking
     }
 
     private void SearchLastKnownPosition() {
         isSearching = true;
         agent.SetDestination(lastKnownPosition);
+        SetAnimationState(true, false, false); // Walking
     }
 
     private void Patrol() {
@@ -173,11 +188,14 @@ public class EnemyAI : MonoBehaviour {
             currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
             agent.SetDestination(patrolPoints[currentPatrolIndex].position);
         }
+
+        SetAnimationState(true, false, false); // Walking
     }
 
     private void ResumePatrol() {
         if (patrolPoints.Length == 0) return;
         agent.SetDestination(patrolPoints[currentPatrolIndex].position);
+        SetAnimationState(true, false, false); // Walking
     }
 
     private void AttackTarget() {
@@ -189,8 +207,9 @@ public class EnemyAI : MonoBehaviour {
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
         }
 
+        SetAnimationState(false, true, false); // Attacking
+
         if (!alreadyAttacked) {
-            // Call appropriate OnDeath() method
             if (target.CompareTag("Player")) {
                 PlayerMovement pm = target.GetComponent<PlayerMovement>();
                 if (pm != null)
@@ -206,10 +225,27 @@ public class EnemyAI : MonoBehaviour {
         }
     }
 
-
     private void ResetAttack() {
         alreadyAttacked = false;
     }
+
+    private void SetAnimationState(bool walking, bool attacking, bool idle) {
+        if (animator == null) return;
+
+        // Reset all states
+        animator.SetBool(_animIDWalk, false);
+        animator.SetBool(_animIDAttack, false);
+        animator.SetBool(_animIDIdle, false);
+
+        // Set the desired one
+        if (walking)
+            animator.SetBool(_animIDWalk, true);
+        else if (attacking)
+            animator.SetBool(_animIDAttack, true);
+        else if (idle)
+            animator.SetBool(_animIDIdle, true);
+    }
+
 
     private void OnDrawGizmosSelected() {
         Gizmos.color = Color.yellow;
@@ -225,6 +261,7 @@ public class EnemyAI : MonoBehaviour {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
+
     public void ResetAI() {
         agent.Warp(StartPos);
         lastKnownPosition = Vector3.zero;
@@ -235,6 +272,6 @@ public class EnemyAI : MonoBehaviour {
         rotationInitialized = false;
         currentRotationTime = 0;
         ResumePatrol();
+        SetAnimationState(false, false, true); // Reset to idle
     }
-
 }
