@@ -120,7 +120,7 @@ public class GM : MonoBehaviour {
         buffer[writeIndex] = data;
         buffer1[columnIndex, writeIndex] = data;
 
-        if (writeIndex == maxframes - 2) {
+        if (writeIndex == maxframes - 1) {
             StartCoroutine(ActivateTemporarily());
             writeIndex = 0;
             size = 0;
@@ -133,6 +133,9 @@ public class GM : MonoBehaviour {
 
     public void stopRecording() {
         if (columnIndex >= 0 && columnIndex < 5) {
+            // Manually record the last frame before stopping
+            RecordLastFrame();
+
             isRecording.SetActive(false);
             if (images[columnIndex] != null)
                 images[columnIndex].SetActive(true);
@@ -141,6 +144,7 @@ public class GM : MonoBehaviour {
             Debug.Log($"Recording {columnIndex + 1} stopped.");
         }
     }
+
 
     public List<Dataframe> GetReplay() {
         List<Dataframe> result = new List<Dataframe>(size);
@@ -159,4 +163,23 @@ public class GM : MonoBehaviour {
         yield return new WaitForSeconds(5);
         overflow.SetActive(false);
     }
+    void RecordLastFrame() {
+        Vector3 pos = playerTransform.position;
+
+        Dataframe data = new Dataframe {
+            location = pos,
+            rotation = playerTransform.rotation,
+            jumped = Input.GetKey(KeyCode.Space), // optional: recent jump state
+            animationBlend = tpc.GetAnimationBlend(),
+            inputMagnitude = tpc.GetInputMagnitude(),
+            interacts = Input.GetKey(KeyCode.E) // optional: recent interact
+        };
+
+        buffer[writeIndex] = data;
+        buffer1[columnIndex, writeIndex] = data;
+
+        writeIndex = (writeIndex + 1) % maxframes;
+        size = Mathf.Min(size + 1, maxframes);
+    }
+
 }
