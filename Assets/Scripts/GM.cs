@@ -116,7 +116,7 @@ public class GM : MonoBehaviour {
             inputMagnitude = tpc.GetInputMagnitude(),
             interacts = latch
         };
-
+        if (data.jumped) Debug.Log("Jumping");
         buffer[writeIndex] = data;
         buffer1[columnIndex, writeIndex] = data;
 
@@ -174,7 +174,7 @@ public class GM : MonoBehaviour {
             inputMagnitude = tpc.GetInputMagnitude(),
             interacts = Input.GetKey(KeyCode.E) // optional: recent interact
         };
-
+        if (data.jumped) Debug.Log("Jumping");
         buffer[writeIndex] = data;
         buffer1[columnIndex, writeIndex] = data;
 

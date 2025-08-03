@@ -32,11 +32,13 @@ public class EnemyAI : MonoBehaviour {
 
     private Transform target;
     private Transform realPlayer;
-
+    public Vector3 StartPos;
     private void Awake() {
         agent = GetComponent<NavMeshAgent>();
     }
-
+    private void Start() {
+        StartPos = transform.position;
+    }
     private void Update() {
         FindTargets();
 
@@ -223,4 +225,16 @@ public class EnemyAI : MonoBehaviour {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
+    public void ResetAI() {
+        agent.Warp(StartPos);
+        lastKnownPosition = Vector3.zero;
+        isSearching = false;
+        isWaitingAtLastPosition = false;
+        target = null;
+        searchTimer = 0;
+        rotationInitialized = false;
+        currentRotationTime = 0;
+        ResumePatrol();
+    }
+
 }

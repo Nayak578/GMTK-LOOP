@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void OnDeath() {
         Debug.Log("PlayerDeath");
+        ResetEnemy();
         if(GM.recording)GM.stopRecording();
         // Reset or disable player
         if (GM.columnIndex < 5) {
@@ -25,6 +26,21 @@ public class PlayerMovement : MonoBehaviour
         } else
             gameObject.SetActive(false);
     }
+    private void ResetEnemy() {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        foreach (GameObject enemy in enemies) {
+            EnemyAI ai = enemy.GetComponent<EnemyAI>();
+            if (ai != null) ai.ResetAI();
+        }
+        GameObject[] snipers = GameObject.FindGameObjectsWithTag("Enemy2");
+        foreach (GameObject sniper in snipers) {
+            EnemyAISniper sniperAI = sniper.GetComponent<EnemyAISniper>();
+            if (sniperAI != null)
+                sniperAI.ResetAI();
+        }
+    }
+
 
 
 }

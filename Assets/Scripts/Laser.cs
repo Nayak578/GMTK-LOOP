@@ -23,7 +23,7 @@ public class Laser : MonoBehaviour
     private void OnTriggerEnter(Collider other) {
         if (other.CompareTag("Player")) {
             Debug.Log("PlayerCollided");
-            StartCoroutine(DisableTemporarily());
+            //StartCoroutine(DisableTemporarily());
             other.GetComponent<PlayerMovement>().OnDeath();
         }
         if (other.CompareTag("Echo")) {

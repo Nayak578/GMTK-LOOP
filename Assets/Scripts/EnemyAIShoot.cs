@@ -1,8 +1,7 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-public class EnemyAISniper : MonoBehaviour
-{
-    public Transform player;
+public class EnemyAISniper : MonoBehaviour {
     public LayerMask obstructionMask;
 
     [Header("Attack Settings")]
@@ -27,8 +26,7 @@ public class EnemyAISniper : MonoBehaviour
     private Vector3 lastKnownPosition;
 
     [Header("Targeting")]
-    public float playerAimHeight = 1.5f; // Adjust height where laser hits player
-
+    public float playerAimHeight = 1.5f;
 
     private bool isTrackingPlayer = false;
 
@@ -37,74 +35,61 @@ public class EnemyAISniper : MonoBehaviour
     private Vector3 currentLaserTarget;
     public float laserSmoothSpeed = 10f;
 
-    private void Start()
-    {
-        // Initialize Line Renderer
+    private Transform currentTarget; // NEW: dynamic target reference
+
+    private void Start() {
         laserLine = GetComponent<LineRenderer>();
         laserLine.enabled = true;
         laserLine.positionCount = 2;
         laserLine.startWidth = 0.05f;
         laserLine.endWidth = 0.05f;
 
-        // Set laser material
         laserLine.material = new Material(Shader.Find("Unlit/Color"));
         laserLine.material.color = Color.red;
 
         currentLaserTarget = transform.position + transform.forward * viewRadius;
     }
 
-    private void Update()
-    {
+    private void Update() {
         timeSinceStart += Time.deltaTime;
 
-        bool playerInFOV = CanSeePlayer();
-        bool playerInRange = Vector3.Distance(transform.position, player.position) <= attackRange;
+        currentTarget = FindVisibleTarget();
 
-        if (playerInFOV && playerInRange)
-        {
+        bool targetInFOV = currentTarget != null;
+        bool targetInRange = targetInFOV && Vector3.Distance(transform.position, currentTarget.position) <= attackRange;
+
+        if (targetInFOV && targetInRange) {
             isTrackingPlayer = true;
             isSearchingLastPosition = false;
-            AttackPlayer();
-        }
-        else if (isTrackingPlayer && !playerInFOV)
-        {
-            lastKnownPosition = player.position;
+            AttackTarget();
+        } else if (isTrackingPlayer && !targetInFOV) {
+            lastKnownPosition = currentTarget ? currentTarget.position : lastKnownPosition;
             isTrackingPlayer = false;
             isSearchingLastPosition = true;
             searchTimer = searchDuration;
         }
 
-        if (isSearchingLastPosition)
-        {
+        if (isSearchingLastPosition) {
             SearchLastKnownPosition();
-        }
-        else if (!isTrackingPlayer)
-        {
+        } else if (!isTrackingPlayer) {
             PatrolRotation();
         }
 
-        // Laser Logic (Always On)
+        // LASER
         Vector3 laserStart = transform.position + Vector3.up * 1.5f;
         Vector3 laserDirection;
 
-        if (playerInFOV)
-        {
-            Vector3 targetPoint = player.position + Vector3.up * playerAimHeight;
+        if (targetInFOV) {
+            Vector3 targetPoint = currentTarget.position + Vector3.up * playerAimHeight;
             laserDirection = (targetPoint - laserStart).normalized;
-        }
-        else
-        {
+        } else {
             laserDirection = transform.forward;
         }
 
         RaycastHit hit;
-        if (Physics.Raycast(laserStart, laserDirection, out hit, viewRadius))
-        {
-            Vector3 target = hit.point;
-            currentLaserTarget = Vector3.Lerp(currentLaserTarget, target, Time.deltaTime * laserSmoothSpeed);
-        }
-        else
-        {
+        if (Physics.Raycast(laserStart, laserDirection, out hit, viewRadius)) {
+            currentLaserTarget = Vector3.Lerp(currentLaserTarget, hit.point, Time.deltaTime * laserSmoothSpeed);
+        } else {
             Vector3 fallback = laserStart + laserDirection * viewRadius;
             currentLaserTarget = Vector3.Lerp(currentLaserTarget, fallback, Time.deltaTime * laserSmoothSpeed);
         }
@@ -113,85 +98,124 @@ public class EnemyAISniper : MonoBehaviour
         laserLine.SetPosition(1, currentLaserTarget);
     }
 
-    private bool CanSeePlayer()
-    {
-        Vector3 eyePosition = transform.position + Vector3.up * 1.5f; // sniper's eye level
-        Vector3 targetPosition = player.position + Vector3.up * playerAimHeight;
-        Vector3 dirToPlayer = (targetPosition - eyePosition).normalized;
-        float distanceToPlayer = Vector3.Distance(eyePosition, targetPosition);
+    // NEW: Find best target (prioritize Echo if both found)
+    private Transform FindVisibleTarget() {
+        List<Transform> potentialTargets = new List<Transform>();
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        GameObject[] echoes = GameObject.FindGameObjectsWithTag("Echo");
 
+        foreach (GameObject go in echoes)
+            if (CanSee(go.transform))
+                return go.transform; // Prioritize Echo
 
-        if (distanceToPlayer < viewRadius)
-        {
-            float angleToPlayer = Vector3.Angle(transform.forward, dirToPlayer);
-            if (angleToPlayer < viewAngle / 2f)
-            {
-                if (!Physics.Raycast(eyePosition, dirToPlayer, distanceToPlayer, obstructionMask))
-                {
+        foreach (GameObject go in players)
+            if (CanSee(go.transform))
+                potentialTargets.Add(go.transform);
+
+        // If Echo not found, return closest Player (if any)
+        Transform closest = null;
+        float minDist = Mathf.Infinity;
+
+        foreach (Transform t in potentialTargets) {
+            float dist = Vector3.Distance(transform.position, t.position);
+            if (dist < minDist) {
+                minDist = dist;
+                closest = t;
+            }
+        }
+        return closest;
+    }
+
+    private bool CanSee(Transform target) {
+        Vector3 eyePos = transform.position + Vector3.up * 1.5f;
+        Vector3 targetPos = target.position + Vector3.up * playerAimHeight;
+        Vector3 dir = (targetPos - eyePos).normalized;
+        float dist = Vector3.Distance(eyePos, targetPos);
+
+        if (dist < viewRadius) {
+            float angle = Vector3.Angle(transform.forward, dir);
+            if (angle < viewAngle / 2f) {
+                if (!Physics.Raycast(eyePos, dir, dist, obstructionMask))
                     return true;
-                }
             }
         }
         return false;
     }
 
-    private void PatrolRotation()
-    {
-        float angle = Mathf.PingPong((timeSinceStart + patrolTimeOffset) * rotationSpeed, maxRotationAngle * 2f) - maxRotationAngle;
-        transform.rotation = Quaternion.Euler(0f, angle, 0f);
-    }
+    private void AttackTarget() {
+        if (!currentTarget) return;
 
-    private void AttackPlayer()
-    {
-        Vector3 lookAtTarget = player.position + Vector3.up * playerAimHeight;
-        transform.LookAt(lookAtTarget);
+        Vector3 lookAt = currentTarget.position + Vector3.up * playerAimHeight;
+        transform.LookAt(lookAt);
 
-        if (!alreadyAttacked)
-        {
-            Debug.Log("Sniper fires at player!");
-            // Your shooting logic goes here
+        if (!alreadyAttacked) {
+            Debug.Log($"Sniper fires at {currentTarget.tag}!");
+            if (currentTarget.CompareTag("Player"))
+                currentTarget.GetComponent<PlayerMovement>()?.OnDeath(); // Call OnDeath on Player
+            else if (currentTarget.CompareTag("Echo"))
+                currentTarget.GetComponent<Ghost>()?.OnDeath(); // Call OnDeath on Ghost
+
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }
     }
 
-    private void SearchLastKnownPosition()
-    {
+    private void PatrolRotation() {
+        float angle = Mathf.PingPong((timeSinceStart + patrolTimeOffset) * rotationSpeed, maxRotationAngle * 2f) - maxRotationAngle;
+        transform.rotation = Quaternion.Euler(0f, angle, 0f);
+    }
+
+    private void SearchLastKnownPosition() {
         Vector3 lookAtTarget = new Vector3(lastKnownPosition.x, transform.position.y, lastKnownPosition.z);
         transform.LookAt(lookAtTarget);
 
         searchTimer -= Time.deltaTime;
 
-        if (searchTimer <= 0f)
-        {
+        if (searchTimer <= 0f) {
             isSearchingLastPosition = false;
 
             float currentYAngle = transform.eulerAngles.y;
             float pingPongTime = (currentYAngle + maxRotationAngle) / rotationSpeed;
             patrolTimeOffset = pingPongTime - timeSinceStart;
 
-            Debug.Log("Player not found. Resuming patrol from last seen direction.");
+            Debug.Log("Player not found. Resuming patrol.");
         }
     }
 
-    private void ResetAttack()
-    {
+    private void ResetAttack() {
         alreadyAttacked = false;
     }
 
-    private void OnDrawGizmosSelected()
-    {
+    private void OnDrawGizmosSelected() {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, viewRadius);
 
-        Vector3 leftBoundary = Quaternion.Euler(0, -viewAngle / 2, 0) * transform.forward;
-        Vector3 rightBoundary = Quaternion.Euler(0, viewAngle / 2, 0) * transform.forward;
+        Vector3 left = Quaternion.Euler(0, -viewAngle / 2, 0) * transform.forward;
+        Vector3 right = Quaternion.Euler(0, viewAngle / 2, 0) * transform.forward;
 
         Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(transform.position, transform.position + leftBoundary * viewRadius);
-        Gizmos.DrawLine(transform.position, transform.position + rightBoundary * viewRadius);
+        Gizmos.DrawLine(transform.position, transform.position + left * viewRadius);
+        Gizmos.DrawLine(transform.position, transform.position + right * viewRadius);
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+    }
+
+    public void ResetAI() {
+        transform.rotation = Quaternion.identity;
+
+        alreadyAttacked = false;
+        isTrackingPlayer = false;
+        isSearchingLastPosition = false;
+        lastKnownPosition = Vector3.zero;
+        searchTimer = 0f;
+        patrolTimeOffset = 0f;
+        timeSinceStart = 0f;
+        currentLaserTarget = transform.position + transform.forward * viewRadius;
+
+        if (laserLine != null) {
+            laserLine.SetPosition(0, transform.position + Vector3.up * 1.5f);
+            laserLine.SetPosition(1, currentLaserTarget);
+        }
     }
 }

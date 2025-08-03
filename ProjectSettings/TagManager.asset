@@ -6,6 +6,8 @@ TagManager:
   tags:
   - CinemachineTarget
   - Echo
+  - Enemy
+  - Enemy2
   layers:
   - Default
   - TransparentFX
