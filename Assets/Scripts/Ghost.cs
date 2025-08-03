@@ -37,7 +37,7 @@ public class Ghost : MonoBehaviour {
             if (animator) {
                 animator.SetFloat(_animIDMotionSpeed, 0);
             }
-            gameObject.SetActive(false);
+           
             return;
         }
 

@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 6836230693644234985}
   m_Layer: 0
   m_Name: Melee_Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -175,7 +175,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 8932274379762792151}
-  player: {fileID: 0}
   whatIsGround:
     serializedVersion: 2
     m_Bits: 0
@@ -192,8 +191,7 @@ MonoBehaviour:
   viewRadius: 10
   viewAngle: 90
   attackRange: 6
-  playerInFOV: 0
-  playerInAttackRange: 0
   searchDuration: 3
   rotationSpeed: 2
   rotationAngle: 45
+  StartPos: {x: 0, y: 0, z: 0}

@@ -2781,13 +2781,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: -0.5698258, y: -0.01737063, z: 0.2582356, w: 0.7799431}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: -61.629, y: -42.561, z: 62.797}
 --- !u!114 &410087042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6186,9 +6186,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 704161800986068448, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2179712927842989328, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
       propertyPath: m_Name
       value: GhostUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 2217851545743100241, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4501380373746880783, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7396049715278929268, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7814505065910326753, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8091455460558319119, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
       propertyPath: m_Pivot.x
@@ -6268,6 +6288,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8091455460558319119, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9112305483624264438, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9134414016336952928, guid: 3f5ac98de9d0f1b438c3758bd7f941b2, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
