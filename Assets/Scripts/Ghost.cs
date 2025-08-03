@@ -11,19 +11,19 @@ public class Ghost : MonoBehaviour {
     private int _animIDSpeed;
     private int _animIDMotionSpeed;
     private int _animIDJump;
-    private bool hasJumped = false;
     private int _animIDGrounded;
+
+    private bool hasJumped = false;
 
     private Dataframe current;
     private Dataframe next;
-    
+
     private void Start() {
         if (animator) {
             _animIDSpeed = Animator.StringToHash("Speed");
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
             _animIDJump = Animator.StringToHash("Jump");
             _animIDGrounded = Animator.StringToHash("Grounded");
-
         }
 
         if (replayData != null && replayData.Count > 1) {
@@ -33,44 +33,51 @@ public class Ghost : MonoBehaviour {
     }
 
     void Update() {
-        if (currentFrame >= replayData.Count - 1) {
-            gameObject.SetActive(false);
-        }
         if (replayData == null || currentFrame >= replayData.Count - 1) {
             if (animator) {
                 animator.SetFloat(_animIDMotionSpeed, 0);
             }
+            gameObject.SetActive(false);
             return;
         }
 
         timer += Time.deltaTime;
+        float t = Mathf.Clamp01(timer / replayInterval);
 
-        float t = timer / replayInterval;
-        t = Mathf.Clamp01(t);
+        // Smooth position interpolation
+        Vector3 lerpedPos = Vector3.Lerp(current.location, next.location, t);
 
-        //Smooth interpolation
-        transform.position = Vector3.Lerp(current.location, next.location, t);
+        // Fix stutter: don't interpolate Y during takeoff frame
+        if (current.jumped && !hasJumped) {
+            lerpedPos.y = current.location.y;
+        }
+
+        transform.position = lerpedPos;
         transform.rotation = Quaternion.Slerp(current.rotation, next.rotation, t);
 
-        // Smooth animation blending
+        // Animation blending
         if (animator) {
             float blendedSpeed = Mathf.Lerp(current.animationBlend, next.animationBlend, t);
             float blendedMagnitude = Mathf.Lerp(current.inputMagnitude, next.inputMagnitude, t);
             animator.SetFloat(_animIDSpeed, blendedSpeed, 0.1f, Time.deltaTime);
             animator.SetFloat(_animIDMotionSpeed, blendedMagnitude, 0.1f, Time.deltaTime);
-            if (animator && current.jumped && !hasJumped) {
+
+            if (current.jumped && !hasJumped) {
                 animator.SetTrigger(_animIDJump);
                 animator.SetBool(_animIDGrounded, false);
                 hasJumped = true;
             }
-
         }
 
         if (t >= 1f) {
             currentFrame++;
             timer = 0f;
             hasJumped = false;
-            animator.SetBool(_animIDGrounded, true);
+
+            if (animator) {
+                animator.SetBool(_animIDGrounded, true);
+            }
+
             if (currentFrame < replayData.Count - 1) {
                 current = replayData[currentFrame];
                 next = replayData[currentFrame + 1];
@@ -92,9 +99,9 @@ public class Ghost : MonoBehaviour {
             }
         }
     }
+
     public void OnDeath() {
         Debug.Log("Echo death");
         Destroy(gameObject);
-        
     }
 }

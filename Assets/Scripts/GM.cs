@@ -24,8 +24,7 @@ public class GM : MonoBehaviour {
     public GameObject isRecording;
     public GameObject overflow;
     private bool[] spawned = new bool[5]; // Track if each ghost has been spawned
-
-    private bool[] recorded = new bool[5];
+    private bool[] recorded = new bool[5]; // Track if each ghost has been recorded
 
     void Start() {
         tpc = playerTransform.GetComponent<ThirdPersonController>();
@@ -53,9 +52,9 @@ public class GM : MonoBehaviour {
             Debug.Log($"Recording started: {columnIndex + 1}/5");
         }
 
-
         if (Input.GetKeyDown(KeyCode.E)) latch = true;
         if (Input.GetKeyDown(KeyCode.Space)) jumpLatch = true;
+
         if (Input.GetKeyDown(KeyCode.Alpha1)) TrySpawnGhost(0);
         if (Input.GetKeyDown(KeyCode.Alpha2)) TrySpawnGhost(1);
         if (Input.GetKeyDown(KeyCode.Alpha3)) TrySpawnGhost(2);
@@ -99,17 +98,18 @@ public class GM : MonoBehaviour {
         }
 
         ghostComponent.enabled = true;
-        spawned[index] = true; // Mark as spawned
+        spawned[index] = true;
 
         if (images[index] != null) {
             images[index].SetActive(false);
         }
     }
 
-
     void RecordFrame() {
+        Vector3 pos = playerTransform.position; // No Y override
+
         Dataframe data = new Dataframe {
-            location = playerTransform.position,
+            location = pos,
             rotation = playerTransform.rotation,
             jumped = jumpLatch,
             animationBlend = tpc.GetAnimationBlend(),
