@@ -6,20 +6,21 @@ public class PressurePLate : MonoBehaviour {
     private Renderer rend;
     private HashSet<Collider> activeColliders = new HashSet<Collider>();
     [SerializeField] GameObject door;
-    [SerializeField] Quaternion openRot;
-    [SerializeField] Quaternion closeRot;
-    private bool isPlateActive = false;
-    private Coroutine rotateCoroutine;
 
-    public Vector3 openEulerAngles = new Vector3(0, 90, 0); // Customize as needed
-    public float rotationSpeed = 180f;
+    private bool isPlateActive = false;
+    private Coroutine moveCoroutine;
+
+    public Vector3 moveOffset = new Vector3(0, 3f, 0); // How high the door moves
+    public float moveSpeed = 3f; // Units per second
+
+    private Vector3 closePos;
+    private Vector3 openPos;
 
     void Start() {
         rend = GetComponent<Renderer>();
-        closeRot = door.transform.rotation;
-        openRot = Quaternion.Euler(openEulerAngles); // set via Inspector or hardcoded
+        closePos = door.transform.position;
+        openPos = closePos + moveOffset;
     }
-
 
     void Update() {
         activeColliders.RemoveWhere(c => c == null || !IsColliderStillInside(c));
@@ -61,33 +62,25 @@ public class PressurePLate : MonoBehaviour {
 
     void MoveObstacle() {
         Debug.Log("Move Obstacle");
-
-        if (rotateCoroutine != null) StopCoroutine(rotateCoroutine);
-        rotateCoroutine = StartCoroutine(RotateDoor(openRot)); // or closeRot
-
+        if (moveCoroutine != null) StopCoroutine(moveCoroutine);
+        moveCoroutine = StartCoroutine(MoveDoor(openPos));
     }
 
     void BlockObstacle() {
         Debug.Log("BlockWithObstacle");
-
-        if (rotateCoroutine != null) StopCoroutine(rotateCoroutine);
-        rotateCoroutine = StartCoroutine(RotateDoor(closeRot)); // or closeRot
-
+        if (moveCoroutine != null) StopCoroutine(moveCoroutine);
+        moveCoroutine = StartCoroutine(MoveDoor(closePos));
     }
 
-
-    IEnumerator RotateDoor(Quaternion targetRotation) {
-        while (Quaternion.Angle(door.transform.rotation, targetRotation) > 0.1f) {
-            door.transform.rotation = Quaternion.RotateTowards(
-                door.transform.rotation,
-                targetRotation,
-                rotationSpeed * Time.deltaTime
+    IEnumerator MoveDoor(Vector3 targetPosition) {
+        while (Vector3.Distance(door.transform.position, targetPosition) > 0.01f) {
+            door.transform.position = Vector3.MoveTowards(
+                door.transform.position,
+                targetPosition,
+                moveSpeed * Time.deltaTime
             );
             yield return null;
         }
-        door.transform.rotation = targetRotation;
+        door.transform.position = targetPosition;
     }
-
-
-
 }
