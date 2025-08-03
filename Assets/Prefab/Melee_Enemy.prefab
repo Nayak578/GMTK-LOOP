@@ -190,7 +190,7 @@ MonoBehaviour:
   timeBetweenAttacks: 0.5
   viewRadius: 10
   viewAngle: 90
-  attackRange: 6
+  attackRange: 4.72
   searchDuration: 3
   rotationSpeed: 2
   rotationAngle: 45
